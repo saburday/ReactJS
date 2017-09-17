@@ -116,6 +116,18 @@ var	Add	=	React.createClass({
           this.setState({authorIsEmpty: true})
         }
       },
+
+  onFieldChange: function(fieldName, e) {
+    var next = {};
+    if (e.target.value.trim().length > 0) {
+      next[fieldName] = false;
+      this.setState(next);
+    } else {
+      next[fieldName] = true;
+      this.setState(next);
+    }
+  },
+
       onTextChange: function(e) {
         if (e.target.value.trim().length > 0){
           this.setState({textIsEmpty: false})
@@ -123,6 +135,7 @@ var	Add	=	React.createClass({
           this.setState({textIsEmpty: true})
         }
       },
+
     render:	function()	{
       var agreeNotChecked = this.state.agreeNotChecked,
           authorIsEmpty = this.state.authorIsEmpty,
@@ -132,13 +145,13 @@ var	Add	=	React.createClass({
 						<input
             type='text'
             className='add__author'
-            onChange={this.onAuthorChange}
+            onChange={this.onFieldChange.bind(this, 'authorIsEmpty')}
             placeholder='Ваше имя'
             ref='author'
             />
             <textarea
             className='add__text'
-            onChange={this.onTextChange}
+            onChange={this.onFieldChange.bind(this, 'textIsEmpty')}
             placeholder='Текст новости'
             ref='text'
             ></textarea>
