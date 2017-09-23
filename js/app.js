@@ -1,3 +1,4 @@
+'use strict';
 var my_news = [
   {
 				author:	'Саша	Печкин',
@@ -15,6 +16,7 @@ var my_news = [
         bigText: 'httttttp'
 		}
 ];
+window.ee = new EventEmitter();
 
 var Article = React.createClass({
   propTypes:	{
@@ -102,9 +104,18 @@ var	Add	=	React.createClass({
   },
   onBtnClickHandler:	function(e)	{
     e.preventDefault();
+    var textEl = ReactDOM.findDOMNode(this.refs.text);
     var author = ReactDOM.findDOMNode(this.refs.author).value;
-    var text = ReactDOM.findDOMNode(this.refs.text).value;
-    alert(author + '\n' + text);
+    var text = textEl.value;
+
+    var item = [{
+      author: author,
+      text: text,
+      bigText: '...'
+    }];
+    window.ee.emit('News.add', item);
+    textEl.value = '';
+    this.setState({textIsEmpty: true});
 		},
   onCheckRuleClik:	function(e)	{
       this.setState({agreeNotChecked: !this.state.agreeNotChecked});
@@ -163,7 +174,7 @@ var	Add	=	React.createClass({
           onClick={this.onBtnClickHandler}
           ref='alert_button'
           disabled={agreeNotChecked || authorIsEmpty || textIsEmpty}>
-          Показать	alert
+          Добавить новость
           </button>
           </form>
 				);
@@ -171,12 +182,28 @@ var	Add	=	React.createClass({
 });
 
 var App = React.createClass({
+  getInitialState: function() {
+    return {
+      news: my_news
+    };
+  },
+  componentDidMount: function() {
+    var self = this;
+    window.ee.addListener('News.add', function (item) {
+      var nextNews = item.concat(self.state.news);
+      self.setState({news: nextNews});
+    });
+  },
+  componentWillUnmount: function() {
+    window.ee.removeListener('News.add');
+  },
   render: function() {
+    console.log('render');
     return (
       <div className="app">
         <h3>Новости</h3>
         <Add	/>
-        <News data={my_news}/>
+        <News data={this.state.news}/>
       </div>
     );
   }
